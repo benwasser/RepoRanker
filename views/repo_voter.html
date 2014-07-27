@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<meta name="viewport" id="vp" content="initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width" />
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel='stylesheet' href='/static/font-awesome-4.1.0/css/font-awesome.min.css'>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+		<link href='http://fonts.googleapis.com/css?family=Cabin+Condensed:400,700|Roboto:400,700' rel='stylesheet' type='text/css'>
+		<link href='/static/style.css' rel='stylesheet' type='text/css'>
+		<title>RepoRanker</title>
+	</head>
+	<body>
+		<div id="wrapper">
+			<h1><i class="fa fa-github-alt"></i> RepoRanker</h1>
+			<div class="subhead">
+				by <a href="https://benwasser.com/">Ben Wasser</a>
+			</div>
+			<br />
+			<h2>Welcome <%= username %></h2>
+			<div class="instructions">
+				<%- starred_something ? '<div class="centered"><a href="/edit-repo-list"><div class="big-green-button">Manage your repo\'s rankings</div></a></div>' : 'After you star someone else\'s repo, you\'ll be able to add your own repos.' %>
+			</div>
+			<div class="repo-list">
+				<div class="repo-list-title"></div>
+				<ul class="sortable">
+					<li class="repo-container" style="cursor:inherit">
+						<div class="repo-rank"><i class="fa fa-bookmark"></i></div>
+						<div class="repo-center-content" style="height:50px;">
+							<div class="repo-title"></div>
+							<div class="repo-description"></div>
+						</div>
+						<div class="repo-stars"></div>
+					</li>
+				</ul>
+				<div class="star-box">
+					<div class="star" onclick="starRepo()"><i class="fa fa-star"></i></div>
+					<span class="skip" onclick="getNewRepo()">or skip</span>
+				</div>
+			</div>
+		</div>
+
+	</body>
+
+	<script type="text/javascript">
+		var starred_something = <%- starred_something %>;
+		var current_repo = -1;
+		$(document).ready(function(){
+			getNewRepo();
+		});
+		
+		function getNewRepo(){
+			$.get('/get-repo', function(data) {
+				if (data.ok){
+					if (data.repo == -1){
+						$('.repo-list-title').html('Sorry, we\'re out of new repos');
+					} else {
+						current_repo = data.repo.id;
+						$('.repo-list-title').html(data.repo.owner + '\'s repo:');
+						$('.repo-title').html('<a href="' + data.repo.html_url + '" target="_blank" style="text-decoration:none;">' + data.repo.name + '</a>');
+						$('.repo-description').html(data.repo.description);
+						$('.repo-stars').html(data.repo.stargazers_count + ' <i class="fa fa-star" style="cursor:pointer;" onclick="starRepo()"></i>');
+					}
+				} else {
+					alert(data.error);
+					console.log(data);
+				}
+			});
+		}
+		
+		function starRepo(){
+			$.get('/star?repo_id=' + current_repo, function(data) {
+				if (!starred_something){
+					window.location = '/edit-repo-list';
+				} else {
+					getNewRepo();
+				}
+			});
+		}
+	</script>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<meta name="viewport" id="vp" content="initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width" />
+		<meta name="apple-mobile-web-app-capable" content="no">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel='stylesheet' href='/static/font-awesome-4.1.0/css/font-awesome.min.css'>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+		<link href='http://fonts.googleapis.com/css?family=Cabin+Condensed:400,700|Roboto+Slab:400,700' rel='stylesheet' type='text/css'>
+		<link href='/static/style.css' rel='stylesheet' type='text/css'>
+		<title>RepoRanker</title>
+	</head>
+	<body>
+		<div id="wrapper" style="width:600px;">
+			<h1><i class="fa fa-github-alt"></i> RepoRanker</h1>
+			<div class="subhead">
+				by <a href="https://benwasser.com/">Ben Wasser</a>
+			</div>
+			<div class="centered">
+				<a href="/auth-github">
+					<div class="big-green-button">
+						Log in with Github to get started
+					</div>
+				</a>
+			</div>
+
+			<h2>Rearrange your GitHub repository rankings</h2>
+			<p>Ever wished your favorite projects were higher up in your GitHub profile? RepoRanker is a way to crowdsource the star rankings of your projects.</p>
+			<div class="centered"><img src="/static/reporanker.png"></div>
+			<div>
+				<h3>How it works:</h3>
+				<ul>
+					<li>Log in with GitHub to allow RepoRanker to access your repo list.</li>
+					<li>You'll be shown other users' repos for you to star.</li>
+					<li>Arrange how you'd like your own repos to be ranked.</li>
+					<li>Your repos will be shown to other users to star, displayed with an algorithm that weights how often it shows the repos by the rankings you set. Eventually, and with enough users, your repos will be starred enough to be sorted in the order you set.</li>
+					<li>The more people who join RepoRanker, the faster your repos will be ranked, so spread the word around.</li>
+				</ul>
+			</div>
+
+			<div style="margin-top:30px">
+				<h3 style="font-size:15px; color: #767276;">Notes:</h3>
+				<ul style="font-size:13px; color: #767276;">
+					<li>RepoRanker and I are unaffiliated with GitHub. This is a weekend project that makes no money and is not intended to infringe on anything or piss anyone off. I'll be happy to change/remove things if it does (email me at benwasser@gmail.com).</li>
+					<li>Logging in will grant me access to do just about anything with your public repos. That said, I only access the URLs/IDs of your public repos and allow you to star other repos via the app. I won't do anything with your account that you don't explicitly tell the app to do. For your added safety, I don't store your access tokens on the server, but rather have you send them each time you make a request to the site. It's still possible someone could compromise my server and view your access tokens as you send them, so I can't take responsibility for the safety of your tokens, but I try to be careful. Don't casually hand out permissions to your accounts, browsers, or phones, as I could just as easily be malicious, careless, or interested in selling your data to third parties (none of which I am, but you can't easily verify that).</li>
+				</ul>
+			</div>
+		</div>
+	</body>
+
+	<script type="text/javascript">
+		$(document).ready(function(){
+			
+		});
+	</script>
+</html>
