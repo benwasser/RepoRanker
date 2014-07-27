@@ -8,7 +8,7 @@
 		<link rel='stylesheet' href='/static/font-awesome-4.1.0/css/font-awesome.min.css'>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 		<script src="/static/jquery-sortable.js"></script>
-		<link href='http://fonts.googleapis.com/css?family=Cabin+Condensed:400,700|Roboto:400,700' rel='stylesheet' type='text/css'>
+		<link href='https://fonts.googleapis.com/css?family=Cabin+Condensed:400,700|Roboto:400,700' rel='stylesheet' type='text/css'>
 		<link href='/static/style.css' rel='stylesheet' type='text/css'>
 		<title>RepoRanker</title>
 	</head>
@@ -16,7 +16,7 @@
 		<div id="wrapper">
 			<h1><i class="fa fa-github-alt"></i> RepoRanker</h1>
 			<div class="subhead">
-				by <a href="https://benwasser.com/">Ben Wasser</a>
+				by <a href="https://benwasser.com/" target="_blank">Ben Wasser</a>
 			</div>
 
 			<div class="instructions">
@@ -36,11 +36,12 @@
 						</li>
 					<% } %>
 				</ul>
+				<%- !your_repos.length ? '<div class="no-repos">We couldn\'t find any public repos on your GitHub account. Feel free to go through and star other people\'s repos by clicking the green button below. You can come back to your repo rank manager when you\'ve added some public repos to your GitHub account.</div>' : '' %>
 			</div>
 			<div class="note">
 				Note: Only the top 5 ranked repos will be shown to other users.
 			</div>
-			<div class="centered">
+			<div class="centered no-select">
 				<a href="/">
 					<div class="big-green-button">
 						Browse and star more repos

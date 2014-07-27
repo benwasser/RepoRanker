@@ -1,27 +1,17 @@
 var fs = require('fs');
 var express = require('express');
 var http = require('http');
-var app = express();
-var server = http.createServer(app);
+https = require('https');
 var ejs = require('ejs');
 var request = require('request');
 
-var clientId = "YOUR_GITHUB_APP_CLIENT_ID";
-var secret = "YOUR_GITHUB_APP_SECRET_KEY";
+//Using SSL because we're sending over GitHub end-user access tokens over the wire
+var ssl_options = {
+	key: fs.readFileSync(__dirname + '/ssl_stuff/reporanker_com.key', 'utf8'),
+	cert: fs.readFileSync(__dirname + '/ssl_stuff/reporanker.ca-bundle', 'utf8')
+};
 
-var repos = [];
-try { repos = JSON.parse(fs.readFileSync(__dirname + '/repos.json', 'utf8')); } catch (err) { console.log('repos not found'); };
-
-var repo_editor = fs.readFileSync(__dirname + '/views/repo_editor.html', 'utf8');
-var repo_voter = fs.readFileSync(__dirname + '/views/repo_voter.html', 'utf8');
-
-//for grabbing updates during development:
-setInterval(function(){
-	repo_editor = fs.readFileSync(__dirname + '/views/repo_editor.html', 'utf8');
-	repo_voter = fs.readFileSync(__dirname + '/views/repo_voter.html', 'utf8');
-},3000);
-
-app.listen(8015);
+var app = express();
 app.use(express.cookieParser());
 app.use(express.bodyParser());
 app.disable('x-powered-by');
@@ -31,8 +21,25 @@ app.configure(function(){
 	app.use(app.router);
 });
 
+var server = https.createServer(ssl_options, app).listen(443);
+
+//GitHub app tokens:
+var clientId = "YOUR_APP_CLIENT_ID";
+var secret = "YOUR_APP_SECRET";
+
+var repos = [];
+try { repos = JSON.parse(fs.readFileSync(__dirname + '/repos.json', 'utf8')); } catch (err) { console.log('repos not found'); };
+
+var repo_editor = fs.readFileSync(__dirname + '/views/repo_editor.html', 'utf8');
+var repo_voter = fs.readFileSync(__dirname + '/views/repo_voter.html', 'utf8');
+
+setInterval(function(){
+	repo_editor = fs.readFileSync(__dirname + '/views/repo_editor.html', 'utf8');
+	repo_voter = fs.readFileSync(__dirname + '/views/repo_voter.html', 'utf8');
+},3000);
+
+
 app.get('/', cookieAuth, function (req, res) {
-	console.log('logged in user accessing site')
 	res.send(ejs.render(repo_voter, {username: req.cookies.reporanker.github_username, starred_something: (req.cookies.reporanker_history ? true : false)}));
 });
 
@@ -87,6 +94,7 @@ app.get('/github-callback', function (req, res) {
 			access_token = access_token.substr(0, access_token.indexOf('&scope'));
 			
 			verifyUser(access_token, function(err, username){
+				console.log('New user: ' + username);
 				res.cookie('reporanker', { github_access_token: access_token, github_username: username }, { expires: new Date(new Date().getTime()+99396409000) });
 				setTimeout(function(){
 					res.redirect('/');
@@ -98,12 +106,13 @@ app.get('/github-callback', function (req, res) {
 	}
 });
 
+
+
 function starRepo(req, res, repo, callback){
 	request.put({
 		url: 'https://api.github.com/user/starred/' + repo.owner + '/' + repo.name + '?access_token=' + req.cookies.reporanker.github_access_token,
 		headers: {'User-Agent': 'reporanker'}
 	}, function(err, response, body){
-		// console.log(response.statusCode);
 		addToHistoryCookie(req, res, repo.id, function(){
 			callback(null, body);
 		});
@@ -124,11 +133,9 @@ function getUserRepos(username){
 }
 
 function cookieAuth(req, res, next){
-	console.log('authenticating by cookie')
 	if (req.cookies && req.cookies.reporanker && req.cookies.reporanker.github_username){
 		return next();
 	} else {
-		console.log('user not logged in');
 		return res.send(fs.readFileSync(__dirname + '/views/logged_out.html', 'utf8'));
 	}
 }
@@ -225,17 +232,16 @@ function findRandomRepo(req){
 	var starred_already = [];
 	if (req.cookies && req.cookies.reporanker_history && req.cookies.reporanker_history.starred) starred_already = req.cookies.reporanker_history.starred;
 	if (!repos.length) return -1;
-	var counter = 0;
 	var temp_found = -1;
-	while (counter < 1000 || temp_found == -1) {
-		counter++;
+	temp_outer_loop: for (var j = 0; j < 1000; j++) {
 		var random_repo = repos[Math.floor(Math.random() * repos.length)];
 		// if (random_repo.owner != req.cookies.reporanker.github_username){
 			if (starred_already.indexOf(random_repo.id) == -1){
 				if (random_repo.rank < 6){
 					for (var i = 0; i < repos.length; i++) {
-						if (repos[i].owner == username && repos[i].rank > random_repo.rank && repos[i].stargazers_count >= random_repo.stargazers_count){
+						if (repos[i].owner == random_repo.owner && repos[i].rank > random_repo.rank && repos[i].stargazers_count >= random_repo.stargazers_count){
 							temp_found = random_repo;
+							break temp_outer_loop;
 						}
 					}
 				}

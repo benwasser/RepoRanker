@@ -7,7 +7,7 @@
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
 		<link rel='stylesheet' href='/static/font-awesome-4.1.0/css/font-awesome.min.css'>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-		<link href='http://fonts.googleapis.com/css?family=Cabin+Condensed:400,700|Roboto:400,700' rel='stylesheet' type='text/css'>
+		<link href='https://fonts.googleapis.com/css?family=Cabin+Condensed:400,700|Roboto:400,700' rel='stylesheet' type='text/css'>
 		<link href='/static/style.css' rel='stylesheet' type='text/css'>
 		<title>RepoRanker</title>
 	</head>
@@ -15,12 +15,12 @@
 		<div id="wrapper">
 			<h1><i class="fa fa-github-alt"></i> RepoRanker</h1>
 			<div class="subhead">
-				by <a href="https://benwasser.com/">Ben Wasser</a>
+				by <a href="https://benwasser.com/" target="_blank">Ben Wasser</a>
 			</div>
 			<br />
 			<h2>Welcome <%= username %></h2>
 			<div class="instructions">
-				<%- starred_something ? '<div class="centered"><a href="/edit-repo-list"><div class="big-green-button">Manage your repo\'s rankings</div></a></div>' : 'After you star someone else\'s repo, you\'ll be able to add your own repos.' %>
+				<%- starred_something ? '<div class="centered no-select"><a href="/edit-repo-list"><div class="big-green-button">Manage your repo\'s rankings</div></a></div>' : 'After you star someone else\'s repo, you\'ll be able to add your own repos.' %>
 			</div>
 			<div class="repo-list">
 				<div class="repo-list-title"></div>
@@ -31,12 +31,12 @@
 							<div class="repo-title"></div>
 							<div class="repo-description"></div>
 						</div>
-						<div class="repo-stars"></div>
+						<div class="repo-stars no-select"></div>
 					</li>
 				</ul>
 				<div class="star-box">
-					<div class="star" onclick="starRepo()"><i class="fa fa-star"></i></div>
-					<span class="skip" onclick="getNewRepo()">or skip</span>
+					<div class="star no-select" onclick="starRepo()"><i class="fa fa-star"></i></div>
+					<span class="skip no-select" onclick="getNewRepo()">or skip</span>
 				</div>
 			</div>
 		</div>
