@@ -74,17 +74,18 @@ app.post('/set-ranking', cookieAuth, function (req, res) {
 
 app.get('/star', cookieAuth, function (req, res) {
 	if (!req.query || !req.query.repo_id) return res.send({ok:false, error: 'Missing repo id'});
+	var temp_found = false;
 	for (var i = 0; i < repos.length; i++) {
 		if (repos[i].id == req.query.repo_id){
+			temp_found = true;
 			repos[i].stargazers_count++;
 			starRepo(req, res, repos[i], function(err, response){
 				if (err) return res.send({ok:false, error: err});
 				res.send({ok:true});
 			});
-			return;
 		}
 	}
-	res.send({ok:false, error:'Repo not found'});
+	if (!temp_found) res.send({ok:false, error:'Repo not found'});
 });
 
 app.get('/github-callback', function (req, res) {
@@ -142,10 +143,11 @@ function cookieAuth(req, res, next){
 
 function addToHistoryCookie(req, res, starred_id, callback){
 	if (req.cookies && req.cookies.reporanker_history && req.cookies.reporanker_history.starred){
-		var temp_new_starred_array = req.cookies.reporanker_history.starred.push(starred_id);
-		res.cookie('reporanker_history', { starred: temp_new_starred_array }, { expires: new Date(new Date().getTime()+99396409000) });
+		var temp_new_starred_array = JSON.parse(req.cookies.reporanker_history.starred);
+		temp_new_starred_array.push(starred_id);
+		res.cookie('reporanker_history', { starred: JSON.stringify(temp_new_starred_array) }, { expires: new Date(new Date().getTime()+99396409000) });
 	} else {
-		res.cookie('reporanker_history', { starred: [starred_id] }, { expires: new Date(new Date().getTime()+99396409000) });
+		res.cookie('reporanker_history', { starred: JSON.stringify([starred_id]) }, { expires: new Date(new Date().getTime()+99396409000) });
 	}
 	setTimeout(function(){
 		return callback();
@@ -230,14 +232,14 @@ function findRandomRepo(req){
 	var username = '';
 	if (req.cookies && req.cookies.reporanker && req.cookies.reporanker.github_username) username = req.cookies.reporanker.github_username;
 	var starred_already = [];
-	if (req.cookies && req.cookies.reporanker_history && req.cookies.reporanker_history.starred) starred_already = req.cookies.reporanker_history.starred;
+	if (req.cookies && req.cookies.reporanker_history && req.cookies.reporanker_history.starred) starred_already = JSON.parse(req.cookies.reporanker_history.starred);
 	if (!repos.length) return -1;
 	var temp_found = -1;
 	temp_outer_loop: for (var j = 0; j < 1000; j++) {
 		var random_repo = repos[Math.floor(Math.random() * repos.length)];
-		// if (random_repo.owner != req.cookies.reporanker.github_username){
+		if (random_repo.owner != username){
 			if (starred_already.indexOf(random_repo.id) == -1){
-				if (random_repo.rank < 6){
+				if (random_repo.rank < 5){
 					for (var i = 0; i < repos.length; i++) {
 						if (repos[i].owner == random_repo.owner && repos[i].rank > random_repo.rank && repos[i].stargazers_count >= random_repo.stargazers_count){
 							temp_found = random_repo;
@@ -246,7 +248,7 @@ function findRandomRepo(req){
 					}
 				}
 			}
-		// }
+		}
 	}
 	return temp_found;
 }

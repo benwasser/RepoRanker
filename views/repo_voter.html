@@ -55,6 +55,8 @@
 				if (data.ok){
 					if (data.repo == -1){
 						$('.repo-list-title').html('Sorry, we\'re out of new repos');
+						$('.repo-title').html('Check back again soon');
+						$('.repo-description').html('Get others to join RepoRanker so you\'ll have more repos to go through and more people will help you rank your repos.');
 					} else {
 						current_repo = data.repo.id;
 						$('.repo-list-title').html(data.repo.owner + '\'s repo:');
